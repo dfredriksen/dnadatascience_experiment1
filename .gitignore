@@ -6,3 +6,4 @@ examples/testfile-small.txt
 examples/testfile.txt
 tests/.accessToken
 client_secrets.json
+config.ini
