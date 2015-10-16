@@ -165,7 +165,7 @@ class Google_Client
    */
   public function setAuthConfig($json)
   {
-    $data = json_decode($json);
+      $data = json_decode($json);
     $key = isset($data->installed) ? 'installed' : 'web';
     if (!isset($data->$key)) {
       throw new Google_Exception("Invalid client secret JSON file.");
