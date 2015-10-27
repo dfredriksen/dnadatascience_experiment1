@@ -27,7 +27,14 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
   $profile = getFirstProfileId($analytics);
 
   // Get the results from the Core Reporting API and print the results.
-  $results = getResults($analytics, $profile);
+  
+  $day = rand(1,27);
+  $month = rand(1,10);
+
+  $day = strlen($day) < 2 ? "0$day" : $day;
+  $month = strlen($month) < 2 ? "0$month" : $month;
+
+  $results = getResults($analytics, $profile, "2015-$month-$day", "2015-$month-$day",1);
   printResults($results, $analytics, $profile);
 } else {
   $redirect_uri = 'http://' . $_SERVER['HTTP_HOST'] . '/oauth2callback.php';
@@ -74,12 +81,12 @@ function getFirstprofileId(&$analytics) {
   }
 }
 
-function getResults(&$analytics, $profileId, $startdate = '2015-01-01', $enddate = '2015-01-01') {
+function getResults(&$analytics, $profileId, $startdate = '2015-01-01', $enddate = '2015-01-01', $startindex = 1) {
     $optParams = array( 
-        'dimensions' => 'ga:pagePath,ga:date',
-        'sort' => 'ga:date,-ga:pageviews',
-        'max-results' => 10,
-        'filters' => 'ga:pagePath=@/story/,ga:pagePath=@/features/'
+        'dimensions' => 'ga:pagePath',
+        'max-results' => 100,
+        'start-index' => $startindex,
+        'filters' => 'ga:pagePath=@/story/,ga:pagePath=@/features/;ga:pageviews>100'
     );
   
    return $analytics->data_ga->get(
@@ -98,18 +105,21 @@ function printResults(&$results, &$analytics, $profileId) {
   $loop = true;
   // Get the entry for the first entry in the first row.
 
-  $file = fopen('nyc.csv', 'a');
+  $file = fopen('nyc_sample.csv', 'a');
+  
+  $day = rand(1,27);
+  $month = rand(1,10);
 
-  $timestamp = 1420070400;
-  $timestamp = strtotime( '+1 day', $timestamp);
-  $date = date( 'Y-m-d', $timestamp);
-
-  while($loop) 
+  $day = strlen($day) < 2 ? "0$day" : $day;
+  $month = strlen($month) < 2 ? "0$month" : $month;
+  $date = "2015-$month-$day";
+  $count = 0;
+  while($count < 365) 
   {
+        echo "$count:\n";
+        echo "Random 100 for $date:\n";
 
-       echo "Top 10 for $date:\n";
-
-        $rows = $results->getRows();
+        $rows = $results->getRows();        
         foreach($rows as $row) 
         {
             if( stristr($row[0], ",") > -1 || stristr($row[1], ",") > -1 || stristr($row[2], ",") > -1 || stristr($row[0], "?") > -1) {
@@ -121,12 +131,11 @@ function printResults(&$results, &$analytics, $profileId) {
             }
         }
       
-        $timestamp = strtotime( '+1 day', $timestamp);
-        if( $timestamp > 1444969482 ) break;
-        $date = date( 'Y-m-d', $timestamp);
-        $results = getResults($analytics, $profileId,$date,$date);
+        $results = getResults($analytics, $profileId,$date,$date,1);
         $startIndex++;       
         if( $startIndex % 10 == 0) sleep(1); //Avoid API rate limits    
+        if(count($results) > 0)
+            $count++;
   }
 
   fclose($file);

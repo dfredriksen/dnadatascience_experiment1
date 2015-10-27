@@ -4,7 +4,7 @@ $host = $configs['database'];
 $user = $configs['user'];
 $pass = $configs['password'];
 $db = new PDO("mysql:host=$host;dbname=Analysis;charset=utf8", $user, $pass);
-$result = $db->query('SELECT path,row_id from Top10');
+$result = $db->query('SELECT path,row_id from Random');
 while( $row = $result->fetch(PDO::FETCH_ASSOC))
 {
     $id = $row['row_id'];
@@ -15,20 +15,20 @@ while( $row = $result->fetch(PDO::FETCH_ASSOC))
         $tail = $pathArray[count($pathArray)-2];
 
     if( $tail == "slideshow" ) {
-        $db->exec("DELETE from Top10 where row_id=$id");
+        $db->exec("DELETE from Random where row_id=$id");
     }
 
     if( $tail != "" )
-        $db->exec("UPDATE Top10 set pathTail = '$tail' where row_id=$id");
+        $db->exec("UPDATE Random set pathTail = '$tail' where row_id=$id");
 }
 
-$db->exec("DELETE FROM Top10 where pathTail IS NULL");
+$db->exec("DELETE FROM Random where pathTail IS NULL");
 
 $result = $db->query("
-    SELECT m.reference_id, s.headline, s.teaser, t.row_id from Analysis.Top10 t
+    SELECT m.reference_id, s.headline, s.teaser, t.row_id from Analysis.Random t
     inner join Main.Mapper m on m.path like CONCAT('%', t.pathTail, '%')
     inner join Main.StoryMain s on m.reference_id = s.story_id 
-    WHERE m.site_id = 1 AND t.story_id = 0
+    WHERE m.site_id = 1
     ");
 while( $row = $result->fetch(PDO::FETCH_ASSOC))
 {
@@ -39,7 +39,7 @@ while( $row = $result->fetch(PDO::FETCH_ASSOC))
 
     echo "$story_id: $headline\n";
 
-    $statement = $db->prepare("UPDATE Top10 set story_id = :story_id, headline=:headline, teaser=:teaser where row_id=:id");
+    $statement = $db->prepare("UPDATE Random set story_id = :story_id, headline=:headline, teaser=:teaser where row_id=:id");
     $statement->bindParam(':story_id', $story_id, PDO::PARAM_INT);
     $statement->bindParam(':headline', $headline);
     $statement->bindParam(':teaser', $teaser);
@@ -47,4 +47,4 @@ while( $row = $result->fetch(PDO::FETCH_ASSOC))
     $statement->execute();
 }
 
-$db->exec("DELETE FROM Top10 where story_id = 0");
+$db->exec("DELETE FROM Random where story_id = 0");
