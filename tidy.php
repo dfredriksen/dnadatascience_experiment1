@@ -4,7 +4,7 @@ $host = $configs['database'];
 $user = $configs['user'];
 $pass = $configs['password'];
 $db = new PDO("mysql:host=$host;dbname=Analysis;charset=utf8", $user, $pass);
-$result = $db->query('SELECT path,row_id from Random');
+/*$result = $db->query('SELECT path,row_id from Random');
 while( $row = $result->fetch(PDO::FETCH_ASSOC))
 {
     $id = $row['row_id'];
@@ -22,7 +22,7 @@ while( $row = $result->fetch(PDO::FETCH_ASSOC))
         $db->exec("UPDATE Random set pathTail = '$tail' where row_id=$id");
 }
 
-$db->exec("DELETE FROM Random where pathTail IS NULL");
+$db->exec("DELETE FROM Random where pathTail IS NULL");*/
 
 $result = $db->query("
     SELECT m.reference_id, s.headline, s.teaser, t.row_id from Analysis.Random t

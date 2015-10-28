@@ -107,15 +107,15 @@ function printResults(&$results, &$analytics, $profileId) {
 
   $file = fopen('nyc_sample.csv', 'a');
   
-  $day = rand(1,27);
-  $month = rand(1,10);
-
-  $day = strlen($day) < 2 ? "0$day" : $day;
-  $month = strlen($month) < 2 ? "0$month" : $month;
-  $date = "2015-$month-$day";
   $count = 0;
   while($count < 365) 
   {
+      $day = rand(1,27);
+      $month = rand(1,10);
+      $day = strlen($day) < 2 ? "0$day" : $day;
+      $month = strlen($month) < 2 ? "0$month" : $month; 
+      $date = "2015-$month-$day";
+
         echo "$count:\n";
         echo "Random 100 for $date:\n";
 
@@ -125,7 +125,7 @@ function printResults(&$results, &$analytics, $profileId) {
             if( stristr($row[0], ",") > -1 || stristr($row[1], ",") > -1 || stristr($row[2], ",") > -1 || stristr($row[0], "?") > -1) {
                 continue;
             } else {
-                $output = $row[0] . "," . $row[1] . "," . $row[2] . "\n";
+                $output = $row[0] . "," . $date . "," . $row[1] . "\n";
                 fwrite($file, $output);
                 echo $output;
             }
